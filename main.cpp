@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include<math.h>
+
+
 struct Header
 {
     uint64_t  upper_level_device_id:16;
@@ -10,12 +12,42 @@ struct Header
     uint64_t lower_level_devices_count:16;
     uint64_t ID:16;
 };
+
+/**
+ * @brief Funcion extract64
+ * 
+ * Esta funcion sirve para extraer los bits de tipo 64.
+ * @param num_bits  Número de bits a extraer
+ * @param mask  Máscara para extraer los bits
+ * @returns (data >> inicio) & mask;  Desplaza a la derecha y aplica máscara
+ * 
+ */
 //Funcion para extraer bit de 64 bits 
-uint64_t extract64(uint64_t data, uint32_t inicio, uint32_t final) {
-    uint32_t num_bits = final - inicio + 1; // Número de bits a extraer
-    uint64_t mask = (1ULL << num_bits) - 1; // Máscara para extraer los bits
-    return (data >> inicio) & mask; // Desplazar a la derecha y aplicar máscara
+uint64_t extract64(uint64_t data, uint32_t inicio, uint32_t final)
+ {
+    uint32_t num_bits = final - inicio + 1; 
+    uint64_t mask = (1ULL << num_bits) - 1; 
+    return (data >> inicio) & mask; 
 }
+/**
+ * @brief Funcion extractHeader
+ * 
+ * Funcion para extraer los datos del mapa de bits haciendo uso tambien de extract64.
+ * @param head  Renombramos a nuestra estructura en la funcion.
+ * @param encabezadoData  data en el cual se usa la funcion extract64 para ir al bit a usar.
+ * @returns head (Para usar obviamente en el main)
+ * 
+ */
+
+/**
+ * @brief Funcion extractHeader
+ * 
+ * Funcion para extraer los datos del mapa de bits haciendo uso tambien de extract64.
+ * @param head  Renombramos a nuestra estructura en la funcion.
+ * @param encabezadoData  data en el cual se usa la funcion extract64 para ir al bit a usar.
+ * @returns head (Para usar obviamente en el main)
+ * 
+ */
 //Funcion para extraer cada bits del header
 Header extractHeader(uint64_t encabezadoData) {
     Header head;
@@ -26,7 +58,17 @@ Header extractHeader(uint64_t encabezadoData) {
     head.ID = extract64(encabezadoData, 48, 63);
     return head;
 }
-
+/**
+ * @brief Funcion main()
+ * 
+ * Funcion para mostrar el main
+ * @param data  Usamos memoria dinamica para data del tipo "uint64_t".
+ * @param cant  Cantidad de paquetes de nuestro archivo.
+ * @param for Ciclo for para poder mostrar los datos del mapa de bits.
+ * @param if if para ir comparando nuestro device_type con su respectiva info en la cual lleva su if tambien.
+ * @returns head (Para usar obviamente en el main)
+ * 
+ */
 int main()
 {
     FILE *f=fopen("network_structure.dat","rb");
@@ -36,7 +78,7 @@ int main()
     printf("\n\nCantidad de paquetes:%d\n\n",cant);
     fseek(f,0,SEEK_SET);
     //Cantidad de paquetes es 12
-    
+
     uint64_t *data = new uint64_t[cant];
     int result = fread(data, sizeof(Header), cant, f);
     if (result != cant) 
@@ -96,6 +138,9 @@ int main()
         {
             printf("Registro de equipo:CONCENTRADOR\n");
         } 
-    delete[] data;
+    
     }
+    fclose(f);
+    delete[] data;
+    return 0;
 }
